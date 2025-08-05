@@ -53,6 +53,14 @@ context("X.509 certificate parser tests #x509", function()
     end
   end)
 
+  test("RSASSA-PSS parameters", function()
+    local cert = loadPemFile("test/data/test_bnotk-nq-bebpo-osci-ca_2023.pem")[1][2]
+    local certAsn = asn.decode(cert)
+    local parse = spy.new(x509.parseCertificateFromAsn)
+    local result = parse(certAsn)
+    assert.spy(parse).returned.with(match.is.table())
+  end)
+
   test("Let's Encrypt certificate", function()
     local bitstring = require("tls13.asn.bitstring")
     local oid = require("tls13.asn.oid")
