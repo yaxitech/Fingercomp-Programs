@@ -92,6 +92,25 @@ lib.sha1 = lib
 
 lib.iso.identifiedOrganization.certicom(132).curve(0).ansip384r1(34)
 
+lib.amdSnp = lib
+  .internet
+  .private(4)
+  .enterprise(1)
+  .amd(3704)
+  .snp(1)
+
+lib.amdSnp.structVersion(1)
+lib.amdSnp.productName(2)
+lib.amdSnp.tcbVersion(3).blSPL(1)
+lib.amdSnp.tcbVersion(3).teeSPL(2)
+lib.amdSnp.tcbVersion(3).spl_4(4)
+lib.amdSnp.tcbVersion(3).spl_5(5)
+lib.amdSnp.tcbVersion(3).spl_6(6)
+lib.amdSnp.tcbVersion(3).spl_7(7)
+lib.amdSnp.tcbVersion(3).snpSPL(3)
+lib.amdSnp.tcbVersion(3).ucodeSPL(8)
+lib.amdSnp.hwID(4)
+
 lib.jointIsoCcitt = lib.root.jointIsoCcitt(2)
 
 lib.ce = lib.jointIsoCcitt.ds(5).certificateExtension(29)
