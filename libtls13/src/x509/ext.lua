@@ -51,8 +51,10 @@ lib.recognizedExtensions[oid.amdSnp.productName] = makeExtension(
 )
 lib.recognizedExtensions[oid.amdSnp.hwID] = makeExtension(
   "hwID",
-  function(_, parser, value) return value end
+  function(_, _, value) return value end
 )
+-- AMD thinks it's fine to skip the DER-encoded of the extnValue (which it isn't, according to RFC5280)
+lib.recognizedExtensions[oid.amdSnp.hwID].nonDerEncodedValue = true
 
 lib.recognizedExtensions[oid.ce.keyUsage] = makeExtension(
   "keyUsage",

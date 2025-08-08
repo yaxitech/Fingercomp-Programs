@@ -127,6 +127,219 @@ context("X.509 certificate parser tests #x509", function()
     )
   end)
 
+  context("VCEK Chain Genoa", function()
+    local oid = require("tls13.asn.oid")
+    local bitstring = require("tls13.asn.bitstring")
+    local utilMap = require("tls13.util.map")
+
+    local chain = loadPemFile("test/data/vcek-chain-genoa.pem")
+
+    for _, element in ipairs(chain) do
+      local name, certDer = table.unpack(element)
+      local certAsn = asn.decode(certDer)
+      local cert, err = x509.parseCertificateFromAsn(certAsn)
+
+      assert:set_parameter("TableFormatLevel", -1)
+      assert.is_not.nil_(cert.tbsCertificate)
+
+      if name == "SEV-VCEK" then
+        test("AMD " .. name, function()
+          assert.same({
+            tbsCertificate = {
+              version = 3,
+              serialNumber = util.fromHex("0000000000000000"),
+              issuer = {
+                {
+                  { type = oid.at.organizationalUnitName, value = "Engineering" },
+                },
+                {
+                  { type = oid.at.countryName, value = "US" },
+                },
+                {
+                  { type = oid.at.localityName, value = "Santa Clara" },
+                },
+                {
+                  { type = oid.at.stateOrProvinceName, value = "CA" },
+                },
+                {
+                  { type = oid.at.organizationName, value = "Advanced Micro Devices" },
+                },
+                {
+                  { type = oid.at.commonName, value = "SEV-Genoa" },
+                },
+              },
+              signature = {
+                algorithm = oid.pkcs1.rsassaPss,
+                parameters = {
+                  hashAlgorithm = {
+                    algorithm = oid.hashalgs.sha384,
+                    parameters = false,
+                  },
+                  maskGenAlgorithm = {
+                    algorithm = oid.pkcs1.mgf1,
+                    parameters = {
+                      algorithm = oid.hashalgs.sha384,
+                      parameters = false,
+                    },
+                  },
+                  saltLength = 48,
+                  trailerField = 1,
+                },
+              },
+              validity = {
+                notBefore = {
+                  year = 2025,
+                  month = 7,
+                  day = 20,
+                  hour = 22,
+                  minute = 15,
+                  second = 42,
+                },
+                notAfter = {
+                  year = 2032,
+                  month = 7,
+                  day = 20,
+                  hour = 22,
+                  minute = 15,
+                  second = 42,
+                },
+              },
+              subject = {
+                {
+                  { type = oid.at.organizationalUnitName, value = "Engineering" },
+                },
+                {
+                  { type = oid.at.countryName, value = "US" },
+                },
+                {
+                  { type = oid.at.localityName, value = "Santa Clara" },
+                },
+                {
+                  { type = oid.at.stateOrProvinceName, value = "CA" },
+                },
+                {
+                  { type = oid.at.organizationName, value = "Advanced Micro Devices" },
+                },
+                {
+                  { type = oid.at.commonName, value = "SEV-VCEK" },
+                },
+              },
+              subjectPublicKeyInfo = {
+                algorithm = {
+                  algorithm = oid.ansiX962.keyType.ecPublicKey,
+                  parameters = {
+                    namedCurve = oid.iso.identifiedOrganization.certicom.curve.ansip384r1,
+                  },
+                },
+                subjectPublicKey = bitstring.fromHex(
+                  "044AB0A6F9F085E7512A1E5A14AA1521C86CB0E3049F2CAF908B2DDE0610CB8C8" ..
+                  "53CA94EE398D4F0D10E6F464EAA884F105A80C0892C8DDFC4FA12AF1C9131A7A9" ..
+                  "91A42B95819BC3BDAFBBC7E7AA769CA2DCFB0B89F60CD6FF237886F3903E45BB"
+                ),
+              },
+              extensions = utilMap.makeProjectionMap(tostring, {
+                [oid.amdSnp.structVersion] = {
+                  extnID = oid.amdSnp.structVersion,
+                  critical = false,
+                  extnValue = 0,
+                },
+                [oid.amdSnp.productName] = {
+                  extnID = oid.amdSnp.productName,
+                  critical = false,
+                  extnValue = "Genoa",
+                },
+                [oid.amdSnp.tcbVersion.blSPL] = {
+                  extnID = oid.amdSnp.tcbVersion.blSPL,
+                  critical = false,
+                  extnValue = 9,
+                },
+                [oid.amdSnp.tcbVersion.teeSPL] = {
+                  extnID = oid.amdSnp.tcbVersion.teeSPL,
+                  critical = false,
+                  extnValue = 0,
+                },
+                [oid.amdSnp.tcbVersion.spl_4] = {
+                  extnID = oid.amdSnp.tcbVersion.spl_4,
+                  critical = false,
+                  extnValue = 0,
+                },
+                [oid.amdSnp.tcbVersion.spl_5] = {
+                  extnID = oid.amdSnp.tcbVersion.spl_5,
+                  critical = false,
+                  extnValue = 0,
+                },
+                [oid.amdSnp.tcbVersion.spl_6] = {
+                  extnID = oid.amdSnp.tcbVersion.spl_6,
+                  critical = false,
+                  extnValue = 0,
+                },
+                [oid.amdSnp.tcbVersion.spl_7] = {
+                  extnID = oid.amdSnp.tcbVersion.spl_7,
+                  critical = false,
+                  extnValue = 0,
+                },
+                [oid.amdSnp.tcbVersion.snpSPL] = {
+                  extnID = oid.amdSnp.tcbVersion.snpSPL,
+                  critical = false,
+                  extnValue = 23,
+                },
+                [oid.amdSnp.tcbVersion.ucodeSPL] = {
+                  extnID = oid.amdSnp.tcbVersion.ucodeSPL,
+                  critical = false,
+                  extnValue = 72,
+                },
+                [oid.amdSnp.hwID] = {
+                  extnID = oid.amdSnp.hwID,
+                  critical = false,
+                  extnValue = util.fromHex(
+                    "9dc99962c063029e430b6f7b734075ec542f4f3ec639e657e14585d3fe559b38" ..
+                    "532bc42d037d618317694ad6634d2507964e276c8eedeac4978c7006bf89f8e1"
+                  ),
+                },
+              }),
+            },
+            signatureAlgorithm = {
+              algorithm = oid.pkcs1.rsassaPss,
+              parameters = {
+                hashAlgorithm = {
+                  algorithm = oid.hashalgs.sha384,
+                  parameters = false,
+                },
+                maskGenAlgorithm = {
+                  algorithm = oid.pkcs1.mgf1,
+                  parameters = {
+                    algorithm = oid.hashalgs.sha384,
+                    parameters = false,
+                  },
+                },
+                saltLength = 48,
+                trailerField = 1,
+              },
+            },
+            signatureValue = bitstring.fromHex(
+              "58c555e0d3e6995186ab221741c37b4c7142e661065ba1243cedc634f5f749e2" ..
+              "0f89c72493d8a267da8239f2f3f5fbbca8c96c46cc53cb5f212a3aa54b744bbd" ..
+              "f577d5fa6145835929af12d16582fec0df2b4c91246da2da0ddb173c5a22da5b" ..
+              "5dd94c817de162acb29557a9a4286ec2605d950ec216b6d9fe5aeedcaf6fe047" ..
+              "ab960b826c49fc806b6c188b7cd22346513d35ee075a6bae60e6c3e79d148294" ..
+              "7c6ea55b7c603d0b949f32c3e99c2338c0a2f980f716a902b8d443fca20aa95b" ..
+              "43c8992156646dc88b6e37af9c89003b6612f943a687797c6514e6845c5ac777" ..
+              "f1619ac6a9bf349c9d76be6607a1aca04d8afd0274d8374eb17a5f213b6d5161" ..
+              "ef7bd540e4a89c4c40f1e0ba5abaa3d5283710947cd1c9ed1cbce927d265dbc6" ..
+              "822c5e30557adc988697f3bdac0881cf3becf9f5f27094d2257d5768ca387032" ..
+              "84d88df0ad62133c0af1916e7511263f787bec638840e095accf08c2bfb4a144" ..
+              "5ccc9675e7b82116451ee4eba9e8f84f2f171e05113a327062dcdf505915c10b" ..
+              "9f3d7e4d5b518aee348f9ba3eb5016bc94e0192a366f1c6159f4f90064dd79a3" ..
+              "7312d045decda18083412983a9416b3eee02708db474ec470fd1a46d8095d22d" ..
+              "ccbe473b32fa96b3a17cfa8c2ad169e1de32573d9119e7c3f2c28ee40c88da1c" ..
+              "f87001d2d1e7a594819808aa3c46be682029a9910578b1e3ffe5da9ef008a933"
+            ),
+          }, cert)
+        end)
+      end
+    end
+  end)
+
   test("Let's Encrypt certificate", function()
     local bitstring = require("tls13.asn.bitstring")
     local oid = require("tls13.asn.oid")
