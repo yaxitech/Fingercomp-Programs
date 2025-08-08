@@ -23,6 +23,37 @@ local function makeExtension(name, parser)
   }
 end
 
+local function makeIntegerExtension(name)
+  return makeExtension(
+    name,
+    function(_, parser, value)
+      local bits, err = parser:checkTag(value, asn.asnTags.universal.integer)
+      return bits and bits[1] or nil, err
+    end
+  )
+end
+
+lib.recognizedExtensions[oid.amdSnp.structVersion] = makeIntegerExtension("structVersion")
+lib.recognizedExtensions[oid.amdSnp.tcbVersion.blSPL] = makeIntegerExtension("blSPL")
+lib.recognizedExtensions[oid.amdSnp.tcbVersion.teeSPL] = makeIntegerExtension("teeSPL")
+lib.recognizedExtensions[oid.amdSnp.tcbVersion.spl_4] = makeIntegerExtension("spl_4")
+lib.recognizedExtensions[oid.amdSnp.tcbVersion.spl_5] = makeIntegerExtension("spl_5")
+lib.recognizedExtensions[oid.amdSnp.tcbVersion.spl_6] = makeIntegerExtension("spl_6")
+lib.recognizedExtensions[oid.amdSnp.tcbVersion.spl_7] = makeIntegerExtension("spl_7")
+lib.recognizedExtensions[oid.amdSnp.tcbVersion.snpSPL] = makeIntegerExtension("snpSPL")
+lib.recognizedExtensions[oid.amdSnp.tcbVersion.ucodeSPL] = makeIntegerExtension("ucodeSPL")
+lib.recognizedExtensions[oid.amdSnp.productName] = makeExtension(
+  "productName",
+  function(_, parser, value)
+    local bits, err = parser:checkTag(value, asn.asnTags.universal.ia5String)
+    return bits and bits[1] or nil, err
+  end
+)
+lib.recognizedExtensions[oid.amdSnp.hwID] = makeExtension(
+  "hwID",
+  function(_, parser, value) return value end
+)
+
 lib.recognizedExtensions[oid.ce.keyUsage] = makeExtension(
   "keyUsage",
   function(_, parser, value)
